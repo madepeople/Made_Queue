@@ -7,10 +7,26 @@
     </modules>
     <global>
         <models>
-            <made_queue>
+            <queue>
                 <class>Made_Queue_Model</class>
-            </made_queue>
+                <resourceModel>queue_resource</resourceModel>
+            </queue>
+            <queue_resource>
+                <class>Made_Queue_Model_Resource</class>
+                <entities>
+                    <job>
+                        <table>made_queue_job</table>
+                    </job>
+                </entities>
+            </queue_resource>
         </models>
+        <resources>
+            <queue_setup>
+                <setup>
+                    <module>Made_Queue</module>
+                </setup>
+            </queue_setup>
+        </resources>
     </global>
     <crontab>
         <jobs>
@@ -19,7 +35,7 @@
                     <cron_expr>* * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>made_queue/worker::executeJobs</model>
+                    <model>queue/worker::executeJobs</model>
                 </run>
             </queue_execute_jobs>
         </jobs>
