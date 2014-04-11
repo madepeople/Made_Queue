@@ -18,7 +18,7 @@ CREATE TABLE {$this->getTable('made_queue_job')} (
     failed_attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
     failed_at DATETIME NULL,
     finished_at DATETIME NULL,
-    created_at DATETIME NOT NULL,
+    created_at DATETIME NOT NULL
 ) ENGINE=MyISAM;
 ");
 
