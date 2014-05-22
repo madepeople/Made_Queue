@@ -28,6 +28,27 @@
             </queue_setup>
         </resources>
     </global>
+    <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <queue>
+                                            <title>Queue Management Section</title>
+                                        </queue>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
     <crontab>
         <jobs>
             <queue_execute_jobs>
@@ -40,4 +61,11 @@
             </queue_execute_jobs>
         </jobs>
     </crontab>
+    <default>
+        <queue>
+            <general>
+                <enabled>0</enabled>
+            </general>
+        </queue>>
+    </default>
 </config>
