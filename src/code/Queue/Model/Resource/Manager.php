@@ -40,4 +40,24 @@ class Made_Queue_Model_Resource_Manager
             'job_id = ' . (int)$jobId
         );
     }
+
+    public function incrementFailedAttempts($jobId)
+    {
+        $write = $this->_getWriteAdapter();
+        $table = $write->quoteIdentifier($this->getMainTable());
+        $query = 'UPDATE ' . $table . ' SET failed_attempts = failed_attempts + 1 WHERE job_id = ?';
+        return $write->query($query, array($jobId));
+    }
+
+    public function getFailedAttempts($jobId)
+    {
+        $read = $this->getReadConnection();
+        $select = $read->select()
+            ->from($this->getMainTable(), array('failed_attempts'))
+            ->where('job_id = ?', $jobId)
+            ;
+
+        $result = $read->fetchOne($select);
+        return $result;
+    }
 }
