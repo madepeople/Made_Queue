@@ -19,10 +19,22 @@ trait Deferrable
      * queue will be used.
      *
      * @param string $queue
+     * @param int $numRetries  The maximum number of retries for a recoverable error
      */
-    public function defer($queue = Made_Queue_Model_Manager::DEFAULT_QUEUE)
+    public function defer($queue = Made_Queue_Model_Job::DEFAULT_QUEUE,
+        $numRetries = 1)
     {
-        $manager = Mage::getModel('queue/manager');
-        $manager->addJob($this, $queue);
+        $job = Mage::getModel('queue/job');
+        $job->setHandler($this);
+        $job->setNumRetries($numRetries);
+        $job->setQueue($queue);
+        $job->save()
+            ->enqueue();
     }
 }
+
+/**
+ * Used to differentiate between fatal and recoverable exceptions
+ */
+class Made_Queue_Model_Job_RecoverableException extends Exception
+{}

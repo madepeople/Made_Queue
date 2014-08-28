@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Made_Queue>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </Made_Queue>
     </modules>
     <global>
@@ -17,6 +17,12 @@
                     <job>
                         <table>made_queue_job</table>
                     </job>
+                    <job_queue>
+                        <table>made_queue_job_queue</table>
+                    </job_queue>
+                    <job_history>
+                        <table>made_queue_job_history</table>
+                    </job_history>
                 </entities>
             </queue_resource>
         </models>
@@ -65,7 +71,11 @@
         <queue>
             <general>
                 <enabled>0</enabled>
+                <max_jobs>100</max_jobs>
             </general>
+            <manager>
+                <lock_model>queue/lock_directory</lock_model>
+            </manager>
         </queue>>
     </default>
 </config>
