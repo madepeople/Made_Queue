@@ -6,12 +6,66 @@
  */
 class Made_Queue_Model_Worker
 {
-    protected $_lockPrefix = 'queue_worker';
-    protected $_lockDirTimeout = 600; // 15 minute default lockdir timeout
-    protected $_lockDirSuffix = '_navision.lock';
 
     /**
-     * Fetch jobs from the queue and execute them
+     * Log that the job has succeeded
+     *
+     * @param Made_Queue_Model_Job_Interface $job
+     */
+    public function logJobSuccess(Made_Queue_Model_Job $job)
+    {
+        Mage::getModel('queue/job_history')
+            ->setJobId($job->getId())
+            ->setStatus(Made_Queue_Model_Job_History::HISTORY_SUCCESS)
+            ->save();
+
+        $job->setStatus(Made_Queue_Model_Job::STATUS_DONE)
+            ->save();
+    }
+
+    /**
+     * Log a recoverable error
+     *
+     * @param Made_Queue_Model_Job_Interface $job
+     * @param Exception $e
+     */
+    public function logJobRecoverableError(Made_Queue_Model_Job $job, Exception $e)
+    {
+        $message = 'Caught ' . get_class($e) . ": \n\n" . $e->getTraceAsString();
+
+        Mage::getModel('queue/job_history')
+            ->setJobId($job->getId())
+            ->setStatus(Made_Queue_Model_Job_History::HISTORY_RECOVERABLE_ERROR)
+            ->setMessage($message)
+            ->save();
+
+        $job->setStatus(Made_Queue_Model_Job::STATUS_PENDING)
+            ->save();
+    }
+
+    /**
+     * Log job failure
+     *
+     * @param Made_Queue_Model_Job_Interface $job
+     * @param Exception $e
+     */
+    public function logJobFailed(Made_Queue_Model_Job $job, Exception $e)
+    {
+        $message = 'Caught ' . get_class($e) . " with message '" . $e->getMessage() . "': \n\n" . $e->getTraceAsString();
+
+        Mage::getModel('queue/job_history')
+            ->setJobId($job->getId())
+            ->setStatus(Made_Queue_Model_Job_History::HISTORY_FAILED)
+            ->setMessage($message)
+            ->save();
+
+        $job->setStatus(Made_Queue_Model_Job::STATUS_FAILED)
+            ->save();
+    }
+
+    /**
+     * Fetch jobs from the queue and execute them. Only runs if the queue is
+     * enabled in admin, which I'm not really sure is a good idea actually
      */
     public function executeJobs()
     {
@@ -19,111 +73,55 @@ class Made_Queue_Model_Worker
             return;
         }
 
-        if (!$this->_createLock()) {
+        $lockName = 'queue_worker';
+        $lock = Mage::getModel(Mage::getStoreConfig('queue/manager/lock_model'));
+        $lock->setTimeout(600);
+        if (!$lock->lock($lockName)) {
             return;
         }
 
-        $manager = Mage::getModel('queue/manager');
-        $manager->getResource()->beginTransaction();
-        $maxJobs = 100;
+        $job = Mage::getModel('queue/job');
+        $job->getResource()->beginTransaction();
+        $maxJobs = (int)Mage::getStoreConfig('queue/general/max_jobs');
 
         try {
-            $i = 0;
-            $jobs = $manager->getPendingJobs();
+            $jobs = Mage::getModel('queue/job')
+                ->getCollection()
+                ->addPendingFilter();
+
+            $jobs->getSelect()
+                ->limit($maxJobs);
 
             foreach ($jobs as $job) {
-                if ($i >= $maxJobs) {
-                    break;
+                $job->dequeue();
+
+                $history = Mage::getModel('queue/job_history')
+                    ->getCollection()
+                    ->addJobFilter($job->getId());
+                if ($history->count()-1 >= $job->getNumRetries()) {
+                    $this->logJobFailed($job, new Exception('Maximum number of job retries reached'));
+                    continue;
                 }
+
                 try {
-                    $job['handler']->perform();
-                    $manager->recordJobFinishedAt($job, new Zend_Db_Expr('NOW()'));
+                    $handler = unserialize($job->getHandler());
+                    $handler->perform();
+                    $this->logJobSuccess($job);
+                } catch (Made_Queue_Model_Job_RecoverableException $e) {
+                    $job->enqueue();
+                    $this->logJobRecoverableError($job, $e);
                 } catch (Exception $e) {
-                    if (!$manager->incrementFailedAttempts($job)) {
-                        $manager->recordJobFailedAt($job, $e, new Zend_Db_Expr('NOW()'));
-                    }
+                    $this->logJobFailed($job, $e);
                 }
-                $i++;
             }
 
-            $manager->getResource()->commit();
-            $this->_releaseLock($this->_lockPrefix);
+            $job->getResource()->commit();
+            $lock->unlock($lockName);
         } catch (Exception $e) {
-            $manager->getResource()->rollBack();
-            $this->_releaseLock($this->_lockPrefix);
+            $job->getResource()->rollBack();
+            $lock->unlock($lockName);
             // Since we throw it, Magento's cron error log can catch it
             throw $e;
-        }
-    }
-
-    /**
-     * Get the locking base directory path
-     *
-     * @return string
-     * @throws Exception
-     */
-    protected function _getLockBasedir()
-    {
-        $baseDir = Mage::getBaseDir('var') . DS . 'locks/nav';
-        if (!is_dir($baseDir)) {
-            if (!mkdir($baseDir, 0777)) {
-                throw new Exception("Couldn't create basedir for locking: $baseDir");
-            }
-        }
-
-        if (!is_writable($baseDir)) {
-            throw new Exception("Locking basedir not writable by webserver: $baseDir");
-        }
-
-        return $baseDir;
-    }
-
-    /**
-     * Protected integration execution with a lock dir
-     *
-     * @param string $prefix  Lock dir prefix
-     * @throws Exception
-     */
-    protected function _createLock($prefix = null)
-    {
-        if ($prefix === null) {
-            $prefix = $this->_lockPrefix;
-        }
-
-        $baseDir = $this->_getLockBasedir();
-        $lockDir = $baseDir . DS . $prefix . $this->_lockDirSuffix;
-        if (is_dir($lockDir)) {
-            if (time()-filemtime($lockDir) > $this->_lockDirTimeout) {
-                if (rmdir($lockDir) === false) {
-                    throw new Exception("Couldn't remove timed out lock dir: $lockDir");
-                }
-            }
-        }
-
-        if (!@mkdir($lockDir)) {
-            throw new Exception("Error creating lock dir, integration probably already running: $lockDir");
-        }
-
-        return true;
-    }
-
-    /**
-     * Releases the lock
-     *
-     * @param string $prefix  Lock dir prefix
-     */
-    protected function _releaseLock($prefix = null)
-    {
-        if ($prefix === null) {
-            $prefix = $this->_lockPrefix;
-        }
-
-        $baseDir = $this->_getLockBasedir();
-        $lockDir = $baseDir . DS . $prefix . $this->_lockDirSuffix;
-        if (is_dir($lockDir)) {
-            if (rmdir($lockDir) === false) {
-                throw new Exception("Couldn't release lock dir: $lockDir");
-            }
         }
     }
 }
