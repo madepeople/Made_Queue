@@ -6,9 +6,6 @@
  */
 class Made_Queue_Model_Worker
 {
-    protected $_lockPrefix = 'queue_worker';
-    protected $_lockDirTimeout = 600; // 15 minute default lockdir timeout
-    protected $_lockDirSuffix = '_navision.lock';
 
     /**
      * Log that the job has succeeded
