@@ -7,7 +7,7 @@
  */
 class Made_Queue_Model_Job_Example implements Made_Queue_Model_Job_Interface
 {
-    use Deferrable;
+    use Made_Queue_Model_Job_Deferrable;
 
     protected $_message;
 

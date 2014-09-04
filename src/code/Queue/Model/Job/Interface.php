@@ -11,7 +11,7 @@ interface Made_Queue_Model_Job_Interface extends Serializable
     public function defer();
 }
 
-trait Deferrable
+trait Made_Queue_Model_Job_Deferrable
 {
     /**
      * Adds itself to the queue in order to have its perform() called at a
@@ -32,9 +32,3 @@ trait Deferrable
             ->enqueue();
     }
 }
-
-/**
- * Used to differentiate between fatal and recoverable exceptions
- */
-class Made_Queue_Model_Job_RecoverableException extends Exception
-{}
