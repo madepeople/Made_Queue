@@ -66,6 +66,7 @@
          <path/>
          <path>Made/Queue</path>
          <path>modules/Made_Queue.xml</path>
+         <path>shell/integration.php</path>
       </path>
       <type>
          <type>file</type>
