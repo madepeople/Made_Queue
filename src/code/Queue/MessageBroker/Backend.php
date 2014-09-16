@@ -33,10 +33,10 @@ class Made_Queue_MessageBroker_Backend extends Made_Queue_MessageBroker_Abstract
     {
         $messageDelivered = false;
 
-        while (($message = $this->_getNextPendingMessage()) && !$messageDelivered) {
+        while (($messageId = $this->_getNextPendingMessageId()) && !$messageDelivered) {
 
             $this->_isDelivering = true;
-            if ($this->_deliverMessageById($message->getId())) {
+            if ($this->_deliverMessageById($messageId)) {
 
                 while ($this->_deliverPublishedMessages()) {
                 }
@@ -222,28 +222,25 @@ class Made_Queue_MessageBroker_Backend extends Made_Queue_MessageBroker_Abstract
             }
 
         } else {
+            // TODO: Release table lock here
             return false;
         }
 
     }
 
     /**
-     * Get next pending message from the database
+     * Get id for the next pending message from the database
      *
-     * @returns Made_Queue_Model_Message|NULL Next pending message or NULL
+     * @returns int|NULL Next pending message id or NULL
      */
-    private function _getNextPendingMessage()
+    private function _getNextPendingMessageId()
     {
         $message = Mage::getModel('queue/message')->getCollection()
                                                   ->addFieldToFilter('status', Made_Queue_Model_Message::STATUS_DELIVERY_PENDING)
                                                   ->setOrder('created_at')
                                                   ->setPageSize(1)
                                                   ->getFirstItem();
-        if ($message->getId() !== null) {
-            return $message;
-        } else {
-            return null;
-        }
+        return $message->getId();
             
     }
 
