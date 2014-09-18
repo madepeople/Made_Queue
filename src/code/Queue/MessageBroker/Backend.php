@@ -201,28 +201,41 @@ class Made_Queue_MessageBroker_Backend extends Made_Queue_MessageBroker_Abstract
     protected function _deliverMessageById($messageId)
     {
 
-        // TODO: Lock message table here
+        // Select message for update to prevent races
+        $write = Mage::getSingleton('core/resource')->getConnection('core_write');
+        $resource = Mage::getModel('sales/order')->getResource();
+        $tableName = $resource->getTable('queue/message');
 
-        if ($message = Mage::getModel('queue/message')->load($messageId)) {
+        $write->beginTransaction();
+        $selectQuery = $write->select()
+                             ->forUpdate()
+                             ->from($tableName, array('message_id'))
+                             ->where('message_id = ?', $messageId)
+                             ->where('status = ?', Made_Queue_Model_Message::STATUS_DELIVERY_PENDING)
+                             ->limit(1);
 
-            if ($message->getStatus() === Made_Queue_Model_Message::STATUS_DELIVERY_PENDING) {
-                $message->setStatus(Made_Queue_Model_Message::STATUS_DELIVERY_IN_PROGRESS);
-                $message->save();
-                // TODO: Release table lock here
+        if ($write->fetchOne($selectQuery) !== false) {
 
-                $this->_deliverMessage($message);
+            $write->update(
+                $tableName,
+                array(
+                    'status' => Made_Queue_Model_Message::STATUS_DELIVERY_IN_PROGRESS,
+                    'status_changed_at' => Varien_Date::now(),
+                ),
+                array('message_id', $messageId));
 
-                $message->delete();
+            $write->commit();
 
-                return true;
+            // We are the only ones that has the right to deliver this message
+            $message = Mage::getModel('queue/message')->load($messageId);
+            $this->_deliverMessage($message);
+            $message->delete();
 
-            } else {
-                // TODO: Release table lock here
-                return false;
-            }
-
+            return true;
         } else {
-            // TODO: Release table lock here
+            // Release the lock here even though nothing changed
+            $write->commit();
+
             return false;
         }
 
