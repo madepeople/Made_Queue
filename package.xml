@@ -10,7 +10,7 @@
    <description>N/A</description>
    <license>4-clause BSD License</license>
    <license_uri/>
-   <version>1.0.1</version>
+   <version>1.0.2</version>
    <stability>stable</stability>
    <notes>N/A</notes>
    <authors>
@@ -66,11 +66,12 @@
          <path/>
          <path>Made/Queue</path>
          <path>modules/Made_Queue.xml</path>
-         <path>shell/integration.php</path>
+         <path>shell/queue.php</path>
       </path>
       <type>
          <type>file</type>
          <type>dir</type>
+         <type>file</type>
          <type>file</type>
       </type>
       <include>
