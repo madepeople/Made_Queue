@@ -41,7 +41,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                                         </files>
+             <files>                                                                                         </files>
          </files>
       </package>
       <extension>
@@ -61,6 +61,7 @@
          <target>magelocal</target>
          <target>magecommunity</target>
          <target>mageetc</target>
+         <target>mage</target>
       </target>
       <path>
          <path/>
@@ -78,8 +79,10 @@
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
