@@ -10,7 +10,7 @@
    <description>N/A</description>
    <license>4-clause BSD License</license>
    <license_uri/>
-   <version>1.0.1</version>
+   <version>1.0.2</version>
    <stability>stable</stability>
    <notes>N/A</notes>
    <authors>
@@ -41,7 +41,7 @@
             <max/>
          </max>
          <files>
-            <files>                                                                                         </files>
+             <files>                                                                                         </files>
          </files>
       </package>
       <extension>
@@ -61,23 +61,28 @@
          <target>magelocal</target>
          <target>magecommunity</target>
          <target>mageetc</target>
+         <target>mage</target>
       </target>
       <path>
          <path/>
          <path>Made/Queue</path>
          <path>modules/Made_Queue.xml</path>
+         <path>shell/queue.php</path>
       </path>
       <type>
          <type>file</type>
          <type>dir</type>
+         <type>file</type>
          <type>file</type>
       </type>
       <include>
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>

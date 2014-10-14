@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Made_Queue>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </Made_Queue>
     </modules>
     <global>
@@ -14,6 +14,12 @@
             <queue_resource>
                 <class>Made_Queue_Model_Resource</class>
                 <entities>
+                    <message>
+                        <table>made_queue_message</table>
+                    </message>
+                    <log>
+                        <table>made_queue_log</table>
+                    </log>
                     <job>
                         <table>made_queue_job</table>
                     </job>
@@ -33,6 +39,11 @@
                 </setup>
             </queue_setup>
         </resources>
+        <helpers>
+            <queue>
+                <class>Made_Queue_Helper</class>
+            </queue>
+        </helpers>
     </global>
     <adminhtml>
         <acl>
