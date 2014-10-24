@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <queue>
+        <subscriber>
+
+            <!-- Add subscribers here
+
+            Example:
+
+            <my_module>
+                <email_notify>
+                    <class>My_Module_Email_Notify_Task</class>
+                </email_notify>
+            </my_module>
+
+            -->
+        </subscriber>
+    </queue>
+</config>
