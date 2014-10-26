@@ -53,7 +53,8 @@ class Made_Shell_Queue extends Mage_Shell_Abstract
 
         switch ($action) {
         case 'queue':
-            $this->getMessage()->save();
+            $message = $this->getMessage();
+            $message->save();
 
             if ($this->getArg('verbose')) {
                 echo "Message queued: {$message}.\n";
