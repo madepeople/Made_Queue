@@ -56,4 +56,15 @@ class Made_Queue_Model_Resource_Job
         $where = $this->_getWriteAdapter()->quoteInto('job_id = ?', $jobId);
         $this->_getWriteAdapter()->delete($table, $where);
     }
+
+    /**
+     * Garbage collect directly in the database
+     */
+    public function gc()
+    {
+        $table = $this->getMainTable();
+        $query = "DELETE FROM {$table} WHERE created_at < NOW() - INTERVAL 1 WEEK";
+        $this->_getWriteAdapter()
+            ->query($query);
+    }
 }

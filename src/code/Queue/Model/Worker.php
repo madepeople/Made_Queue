@@ -124,4 +124,16 @@ class Made_Queue_Model_Worker
             throw $e;
         }
     }
+
+    /**
+     * Garbage collect the queue in mysql, it might grow like crazy
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function gc()
+    {
+        $resource = Mage::getResourceModel('queue/job');
+        $resource->gc();
+    }
+
 }
