@@ -16,5 +16,4 @@ class Made_Queue_Model_Resource_Job_History
     {
         $this->_init('queue/job_history', 'history_id');
     }
-
 }

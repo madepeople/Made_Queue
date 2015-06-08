@@ -76,6 +76,14 @@
                     <model>queue/worker::executeJobs</model>
                 </run>
             </queue_execute_jobs>
+            <queue_gc>
+                <schedule>
+                    <cron_expr>0 0 * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>queue/worker::gc</model>
+                </run>
+            </queue_gc>
         </jobs>
     </crontab>
     <default>
