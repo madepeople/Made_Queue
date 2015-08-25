@@ -63,7 +63,7 @@ class Made_Queue_Model_Resource_Job
     public function gc()
     {
         $table = $this->getMainTable();
-        $query = "DELETE FROM {$table} WHERE created_at < NOW() - INTERVAL 1 WEEK";
+        $query = "DELETE FROM {$table} WHERE created_at < NOW() - INTERVAL 1 DAY";
         $this->_getWriteAdapter()
             ->query($query);
     }
