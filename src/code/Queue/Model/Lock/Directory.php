@@ -23,7 +23,9 @@ class Made_Queue_Model_Lock_Directory
     {
         $baseDir = Mage::getBaseDir('var') . DS . 'locks/queue';
         if (!is_dir($baseDir)) {
-            if (!mkdir($baseDir, 0777)) {
+            $varienIo = new Varien_Io_File;
+            $result = $varienIo->mkdir($baseDir, 0777, true);
+            if ($result === false) {
                 throw new Exception("Couldn't create basedir for locking: $baseDir");
             }
         }
