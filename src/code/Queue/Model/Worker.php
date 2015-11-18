@@ -81,7 +81,6 @@ class Made_Queue_Model_Worker
         }
 
         $job = Mage::getModel('queue/job');
-        $job->getResource()->beginTransaction();
         $maxJobs = (int)Mage::getStoreConfig('queue/general/max_jobs');
 
         try {
@@ -115,10 +114,8 @@ class Made_Queue_Model_Worker
                 }
             }
 
-            $job->getResource()->commit();
             $lock->unlock($lockName);
         } catch (Exception $e) {
-            $job->getResource()->rollBack();
             $lock->unlock($lockName);
             // Since we throw it, Magento's cron error log can catch it
             throw $e;
