@@ -69,10 +69,6 @@ class Made_Queue_Model_Worker
      */
     public function executeJobs($queue)
     {
-        if (!Mage::getStoreConfigFlag('queue/general/enabled')) {
-            return;
-        }
-
         $queue = trim($queue);
         if (empty($queue)) {
             $queue = Made_Queue_Model_Job::DEFAULT_QUEUE;

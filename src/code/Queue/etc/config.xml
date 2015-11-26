@@ -73,7 +73,7 @@
                     <cron_expr>* * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>queue/worker::executeJobs</model>
+                    <model>queue/observer::executeJobs</model>
                 </run>
             </queue_execute_jobs>
             <queue_gc>
@@ -81,7 +81,7 @@
                     <cron_expr>0 0 * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>queue/worker::gc</model>
+                    <model>queue/observer::gc</model>
                 </run>
             </queue_gc>
         </jobs>
