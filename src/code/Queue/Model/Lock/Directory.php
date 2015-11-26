@@ -26,7 +26,7 @@ class Made_Queue_Model_Lock_Directory
             $varienIo = new Varien_Io_File;
             $result = $varienIo->mkdir($baseDir, 0777, true);
             if ($result === false) {
-                return $result;
+                throw new Exception("Couldn't create basedir for locking: $baseDir");
             }
         }
 
@@ -97,7 +97,7 @@ class Made_Queue_Model_Lock_Directory
         $this->test($name);
 
         if (!@mkdir($lockDir)) {
-            throw new Exception("Error creating lock dir: $lockDir");
+            return false;
         }
 
         return true;
