@@ -2,3 +2,4 @@ src/code/*                  app/code/community/Made/
 Made_Queue.xml              app/etc/modules/
 package.xml                 var/connect/Made_Queue.xml
 src/shell/queue.php         shell/
+src/shell/queue-worker.php  shell/

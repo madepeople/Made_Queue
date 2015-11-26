@@ -28,4 +28,17 @@ class Made_Queue_Model_Resource_Job_Collection
         return $this;
     }
 
+    /**
+     * Filters items per queue name
+     *
+     * @param $queue
+     * @return $this
+     */
+    public function addQueueFilter($queue)
+    {
+        $this->getSelect()
+            ->where('main_table.queue = ?', $queue);
+        return $this;
+    }
+
 }

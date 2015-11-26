@@ -67,7 +67,7 @@ class Made_Queue_Model_Worker
      * Fetch jobs from the queue and execute them. Only runs if the queue is
      * enabled in admin, which I'm not really sure is a good idea actually
      */
-    public function executeJobs()
+    public function executeJobs($queue = Made_Queue_Model_Job::DEFAULT_QUEUE)
     {
         if (!Mage::getStoreConfigFlag('queue/general/enabled')) {
             return;
@@ -80,12 +80,12 @@ class Made_Queue_Model_Worker
             return;
         }
 
-        $job = Mage::getModel('queue/job');
         $maxJobs = (int)Mage::getStoreConfig('queue/general/max_jobs');
 
         try {
             $jobs = Mage::getModel('queue/job')
                 ->getCollection()
+                ->addQueueFilter($queue)
                 ->addPendingFilter();
 
             $jobs->getSelect()
