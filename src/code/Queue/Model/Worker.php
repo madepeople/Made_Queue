@@ -73,6 +73,7 @@ class Made_Queue_Model_Worker
             return;
         }
 
+        $queue = trim($queue);
         if (empty($queue)) {
             $queue = Made_Queue_Model_Job::DEFAULT_QUEUE;
         }
