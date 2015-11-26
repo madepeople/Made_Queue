@@ -67,13 +67,17 @@ class Made_Queue_Model_Worker
      * Fetch jobs from the queue and execute them. Only runs if the queue is
      * enabled in admin, which I'm not really sure is a good idea actually
      */
-    public function executeJobs($queue = Made_Queue_Model_Job::DEFAULT_QUEUE)
+    public function executeJobs($queue)
     {
         if (!Mage::getStoreConfigFlag('queue/general/enabled')) {
             return;
         }
 
-        $lockName = 'queue_worker';
+        if (empty($queue)) {
+            $queue = Made_Queue_Model_Job::DEFAULT_QUEUE;
+        }
+
+        $lockName = 'queue_worker.' . $queue;
         $lock = Mage::getModel(Mage::getStoreConfig('queue/manager/lock_model'));
         $lock->setTimeout(600);
         if (!$lock->lock($lockName)) {
