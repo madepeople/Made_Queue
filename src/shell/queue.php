@@ -45,7 +45,7 @@ class Made_Shell_Queue extends Mage_Shell_Abstract
     public function run()
     {
         if (count($_SERVER['argv']) < 2) {
-            echo "Invalid\n";
+            echo "Invalid arguments. Use --help for more information.\n";
             return -1;
         }
 
