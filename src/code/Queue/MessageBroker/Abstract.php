@@ -42,7 +42,7 @@ abstract class Made_Queue_MessageBroker_Abstract implements Made_Queue_MessageBr
         if ($options !== null) {
             foreach ($this->_options as $key=>$default) {
                 if (array_key_exists($key, $options)) {
-                    $_options = $options[$key];
+                    $this->_options = $options[$key];
                 }
             }
         }
