@@ -215,14 +215,14 @@ class Made_Queue_MessageBroker_Backend extends Made_Queue_MessageBroker_Abstract
                              ->limit(1);
 
         if ($write->fetchOne($selectQuery) !== false) {
-
+            $where = $write->quoteInto('message_id = ?', $messageId);
             $write->update(
                 $tableName,
                 array(
                     'status' => Made_Queue_Model_Message::STATUS_DELIVERY_IN_PROGRESS,
                     'status_changed_at' => Varien_Date::now(),
                 ),
-                array('message_id', $messageId));
+                $where);
 
             $write->commit();
 
