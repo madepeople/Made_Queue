@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Made_Queue>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </Made_Queue>
     </modules>
     <global>
