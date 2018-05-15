@@ -132,6 +132,8 @@ class Made_Queue_Model_Worker
     {
         $resource = Mage::getResourceModel('queue/job');
         $resource->gc();
+        $resource = Mage::getResourceModel('queue/log');
+        $resource->gc();
     }
 
 }
